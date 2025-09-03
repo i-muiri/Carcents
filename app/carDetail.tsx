@@ -1,60 +1,61 @@
-import React, { useMemo, useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet } from 'react-native';
-import { useRoute } from '@react-navigation/native';
-import { useCars } from '../src/context/carsContext';
+import { useLocalSearchParams } from "expo-router";
+import React, { useState } from "react";
+import { Button, FlatList, StyleSheet, Text, TextInput, View } from "react-native";
+import { Car, useCars } from "../src/context/carsContext";
 
+export default function CarDetail() {
+  const params = useLocalSearchParams();
+  const carId = params.carId as string;
+  const { cars, updateCarExpenses } = useCars();
 
+  const car = cars.find((c: Car) => c.id === carId);
+  const [expense, setExpense] = useState("");
 
-export default function CarDetailsScreen() {
-const route = useRoute();
-const { carId } = route.params || {};
-const { cars, addExpense, setSellingPrice } = useCars();
+  if (!car) return <Text>Car not found</Text>;
 
+  const handleAddExpense = () => {
+    const value = Number(expense);
+    if (value > 0) {
+      updateCarExpenses(car.id, value);
+      setExpense("");
+    }
+  };
 
-const car = useMemo(() => cars.find(c => c.id === carId), [cars, carId]);
+  const totalExpenses = car.expenses.reduce((sum, e) => sum + e, 0);
 
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>{car.name}</Text>
+      <Text>Model: {car.model}</Text>
+      <Text>Year: {car.year}</Text>
+      <Text>Price: ${car.price}</Text>
+      <Text>Total Expenses: ${totalExpenses}</Text>
 
-const [type, setType] = useState('');
-const [description, setDescription] = useState('');
-const [amount, setAmount] = useState('');
-const [sellPriceInput, setSellPriceInput] = useState(car?.sellingPrice ? String(car.sellingPrice) : '');
+      <Text style={styles.subtitle}>Add Expense</Text>
+      <TextInput
+        placeholder="Enter expense"
+        value={expense}
+        onChangeText={setExpense}
+        keyboardType="numeric"
+        style={styles.input}
+      />
+      <Button title="Add Expense" onPress={handleAddExpense} />
 
-
-if (!car) {
-return (
-<View style={styles.container}><Text>Car not found.</Text></View>
-);
+      <Text style={styles.subtitle}>Expenses List</Text>
+      <FlatList
+        data={car.expenses}
+        keyExtractor={(_, index) => index.toString()}
+        renderItem={({ item, index }) => (
+          <Text>{index + 1}. ${item}</Text>
+        )}
+      />
+    </View>
+  );
 }
 
-
-const totalExpenses = (car.expenses || []).reduce((sum, e) => sum + Number(e.amount || 0), 0);
-const profit = car.sellingPrice ? Number(car.sellingPrice) - Number(car.purchasePrice || 0) - totalExpenses : null;
-
-
-const onAddExpense = () => {
-if (!amount) return;
-const expense = {
-id: `exp-${Date.now()}`,
-type: type.trim() || 'Expense',
-description: description.trim(),
-amount: Number(amount),
-date: new Date().toISOString().slice(0,10),
-};
-addExpense(car.id, expense);
-setType('');
-setDescription('');
-setAmount('');
-};
-
-
-const onSaveSellingPrice = () => {
-const num = Number(sellPriceInput || 0);
-setSellingPrice(car.id, num);
-};
-
-
-return (
-<View style={styles.container}>
-<View style={styles.card}></View></View>
-)
-}
+const styles = StyleSheet.create({
+  container: { flex: 1, padding: 16 },
+  title: { fontSize: 22, fontWeight: "bold", marginBottom: 8 },
+  subtitle: { marginTop: 16, fontSize: 18, fontWeight: "bold" },
+  input: { borderWidth: 1, borderColor: "#ccc", padding: 8, borderRadius: 6, marginTop: 8, marginBottom: 12 },
+});

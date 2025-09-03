@@ -1,3 +1,4 @@
+import React from "react";
 import { CarsProvider } from "../src/context/carsContext";
 import { Slot } from "expo-router";
 

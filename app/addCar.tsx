@@ -1,75 +1,39 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { useCars } from '../src/context/carsContext';
-
+import 'react-native-get-random-values';
+import { useRouter } from "expo-router";
+import React, { useState } from "react";
+import { Button, StyleSheet, Text, TextInput, View } from "react-native";
+import { v4 as uuidv4 } from "uuid";
+import { useCars } from "../src/context/carsContext";
 
 export default function AddCarScreen() {
-const navigation = useNavigation();
-const { addCar } = useCars();
+  const { addCar } = useCars();
+  const router = useRouter();
 
+  const [name, setName] = useState("");
+  const [model, setModel] = useState("");
+  const [year, setYear] = useState("");
+  const [price, setPrice] = useState("");
 
-const [make, setMake] = useState('');
-const [model, setModel] = useState('');
-const [year, setYear] = useState('');
-const [purchasePrice, setPurchasePrice] = useState('');
-const [purchaseDate, setPurchaseDate] = useState(new Date().toISOString().slice(0, 10));
+  const handleAddCar = () => {
+    if (!name || !model || !year || !price) return;
+    addCar({ id: uuidv4(), name, model, year: Number(year), price: Number(price), expenses: [] });
+    router.push("/cars"); // go back to Cars tab
+  };
 
-
-const onSave = () => {
-if (!make || !model) {
-Alert.alert('Missing info', 'Please enter make and model.');
-return;
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>Add a Car</Text>
+      <TextInput placeholder="Car Name" value={name} onChangeText={setName} style={styles.input} />
+      <TextInput placeholder="Car Model" value={model} onChangeText={setModel} style={styles.input} />
+      <TextInput placeholder="Year of Manufacture" value={year} onChangeText={setYear} keyboardType="numeric" style={styles.input} />
+      <TextInput placeholder="Car Price" value={price} onChangeText={setPrice} keyboardType="numeric" style={styles.input} />
+      <Button title="Add Car" onPress={handleAddCar} />
+    </View>
+  );
 }
-const car = {
-id: `car-${Date.now()}`,
-make: make.trim(),
-model: model.trim(),
-year: year.trim(),
-purchasePrice: Number(purchasePrice || 0),
-purchaseDate,
-sellingPrice: '',
-expenses: [],
-};
-addCar(car);
-navigation.goBack();
-};
-
-
-return (
-<View style={styles.container}>
-<Text style={styles.label}>Make</Text>
-<TextInput style={styles.input} value={make} onChangeText={setMake} placeholder="e.g. Toyota" />
-
-
-<Text style={styles.label}>Model</Text>
-<TextInput style={styles.input} value={model} onChangeText={setModel} placeholder="e.g. Axio" />
-
-
-<Text style={styles.label}>Year</Text>
-<TextInput style={styles.input} value={year} onChangeText={setYear} placeholder="e.g. 2012" keyboardType="numeric" />
-
-
-<Text style={styles.label}>Purchase Price (KES)</Text>
-<TextInput style={styles.input} value={purchasePrice} onChangeText={setPurchasePrice} placeholder="e.g. 600000" keyboardType="numeric" />
-
-
-<Text style={styles.label}>Purchase Date</Text>
-<TextInput style={styles.input} value={purchaseDate} onChangeText={setPurchaseDate} placeholder="YYYY-MM-DD" />
-
-
-<TouchableOpacity style={styles.saveBtn} onPress={onSave}>
-<Text style={styles.saveBtnText}>Save Car</Text>
-</TouchableOpacity>
-</View>
-);
-}
-
 
 const styles = StyleSheet.create({
-container: { flex: 1, padding: 16, backgroundColor: '#fff' },
-label: { marginTop: 10, marginBottom: 6, fontWeight: '600' },
-input: { borderWidth: 1, borderColor: '#e5e7eb', borderRadius: 10, padding: 10 },
-saveBtn: { marginTop: 18, backgroundColor: '#2563eb', padding: 12, borderRadius: 10, alignItems: 'center' },
-saveBtnText: { color: 'white', fontWeight: '700' },
+  container: { flex: 1, padding: 16, justifyContent: "center" },
+  title: { fontSize: 22, fontWeight: "bold", marginBottom: 16 },
+  input: { borderWidth: 1, borderColor: "#ccc", padding: 8, marginBottom: 12, borderRadius: 6 },
 });
