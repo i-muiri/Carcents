@@ -1,9 +1,9 @@
 import { View, Text } from "react-native";
 
-export default function HomeScreen() {
+export default function ExpensesScreen() {
   return (
     <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <Text>Welcome to Carcents 🚗</Text>
+      <Text>Expenses per car 💰</Text>
     </View>
   );
 }

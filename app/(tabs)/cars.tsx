@@ -1,9 +1,9 @@
 import { View, Text } from "react-native";
 
-export default function HomeScreen() {
+export default function CarsScreen() {
   return (
     <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <Text>Welcome to Carcents 🚗</Text>
+      <Text>Track your cars here 🛠️</Text>
     </View>
   );
 }
