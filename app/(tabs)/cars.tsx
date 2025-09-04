@@ -1,7 +1,8 @@
 import { useRouter } from "expo-router";
 import React from "react";
 import { Button, FlatList, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { Car, useCars } from "../../src/context/carsContext";
+import { useCars } from "../../src/context/carsContext";
+import { Car } from "../../src/types/car";
 
 export default function CarsTab() {
   const { cars } = useCars();

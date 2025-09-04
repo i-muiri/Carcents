@@ -1,18 +1,13 @@
 import React, { createContext, useContext, useState } from "react";
+import { Car, } from "../types/car";
 
-export type Car = {
-  id: string;
-  name: string;
-  model: string;
-  year: number;
-  price: number;
-  expenses: number[];
-};
+export type Expense = { id: string; description: string; amount: number; date: string };
+
 
 type CarsContextType = {
   cars: Car[];
   addCar: (car: Car) => void;
-  updateCarExpenses: (carId: string, expense: number) => void;
+  addExpense: (carId: string, expense: Expense) => void;
 };
 
 const CarsContext = createContext<CarsContextType | undefined>(undefined);
@@ -20,20 +15,20 @@ const CarsContext = createContext<CarsContextType | undefined>(undefined);
 export function CarsProvider({ children }: { children: React.ReactNode }) {
   const [cars, setCars] = useState<Car[]>([]);
 
-  function addCar(car: Car) {
-    setCars((prev) => [...prev, car]);
-  }
+  const addCar = (car: Car) => {
+    setCars(prev => [...prev, car]);
+  };
 
-  function updateCarExpenses(carId: string, expense: number) {
-    setCars((prev) =>
-      prev.map((c) =>
+  const addExpense = (carId: string, expense: Expense) => {
+    setCars(prev =>
+      prev.map(c =>
         c.id === carId ? { ...c, expenses: [...c.expenses, expense] } : c
       )
     );
-  }
+  };
 
   return (
-    <CarsContext.Provider value={{ cars, addCar, updateCarExpenses }}>
+    <CarsContext.Provider value={{ cars, addCar, addExpense }}>
       {children}
     </CarsContext.Provider>
   );
